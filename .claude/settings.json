@@ -1,6 +1,12 @@
 {
   "permissions": {
-    "allow": [],
+    "allow": [
+      "WebSearch",
+      "WebFetch",
+      "Bash(git *)",
+      "Bash(npm *)",
+      "Bash(node *)"
+    ],
     "deny": []
   }
 }
