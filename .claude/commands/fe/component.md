@@ -7,7 +7,7 @@ Format: `<ComponentName> [type]`
 ---
 
 ## Role
-You are a Senior Frontend Engineer with 10+ years of React experience. You write components that are: type-safe, accessible, composable, testable, and follow React 19 best practices.
+You are a Senior Frontend Engineer with 10+ years of React experience. You write components that are: type-safe, accessible, composable, testable, and follow React 19 + Tailwind CSS best practices.
 
 ---
 
@@ -37,7 +37,7 @@ Component destination: `frontend/src/components/<ComponentName>/`
 
 ## Step 3 — Generate files
 
-Create **4 files**:
+Create **3 files** (no CSS Module — use Tailwind classes directly):
 
 ### 3a. `<ComponentName>.tsx` — Main component
 
@@ -48,15 +48,13 @@ Rules:
 - Props: use `children?: React.ReactNode` when composable
 - Accessibility: add `aria-*` attributes, semantic HTML
 - React 19: prefer `useActionState` for forms, `use()` for async when applicable
-- NO inline styles — use CSS Modules only
+- Styling: **Tailwind CSS utility classes only** — no inline styles, no CSS Modules
 - Handle loading / error / empty states when type is `data`
 
 Template by type:
 
 **ui:**
 ```tsx
-import styles from './<ComponentName>.module.css'
-
 export interface <ComponentName>Props {
   children?: React.ReactNode
   className?: string
@@ -65,7 +63,7 @@ export interface <ComponentName>Props {
 
 export function <ComponentName>({ children, className }: <ComponentName>Props) {
   return (
-    <div className={[styles.root, className].filter(Boolean).join(' ')}>
+    <div className={['/* base tailwind classes */', className].filter(Boolean).join(' ')}>
       {children}
     </div>
   )
@@ -75,7 +73,6 @@ export function <ComponentName>({ children, className }: <ComponentName>Props) {
 **form:**
 ```tsx
 import { useActionState } from 'react'
-import styles from './<ComponentName>.module.css'
 
 export interface <ComponentName>Props {
   onSubmit: (data: FormData) => Promise<{ error?: string }>
@@ -84,9 +81,15 @@ export interface <ComponentName>Props {
 export function <ComponentName>({ onSubmit }: <ComponentName>Props) {
   const [state, action, isPending] = useActionState(onSubmit, { error: undefined })
   return (
-    <form action={action} className={styles.root}>
-      {state.error && <p role="alert" className={styles.error}>{state.error}</p>}
-      <button type="submit" disabled={isPending}>
+    <form action={action} className="flex flex-col gap-4">
+      {state.error && (
+        <p role="alert" className="text-sm text-red-600">{state.error}</p>
+      )}
+      <button
+        type="submit"
+        disabled={isPending}
+        className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+      >
         {isPending ? 'Submitting…' : 'Submit'}
       </button>
     </form>
@@ -96,21 +99,18 @@ export function <ComponentName>({ onSubmit }: <ComponentName>Props) {
 
 **layout:**
 ```tsx
-import styles from './<ComponentName>.module.css'
-
 export interface <ComponentName>Props {
   children: React.ReactNode
 }
 
 export function <ComponentName>({ children }: <ComponentName>Props) {
-  return <section className={styles.root}>{children}</section>
+  return <section className="/* layout tailwind classes */">{children}</section>
 }
 ```
 
 **data:**
 ```tsx
 import { use } from 'react'
-import styles from './<ComponentName>.module.css'
 
 export interface <ComponentName>Props {
   dataPromise: Promise<unknown[]>
@@ -118,21 +118,12 @@ export interface <ComponentName>Props {
 
 export function <ComponentName>({ dataPromise }: <ComponentName>Props) {
   const data = use(dataPromise)
-  if (!data.length) return <p className={styles.empty}>No data found.</p>
-  return <ul className={styles.root}>{/* render items */}</ul>
+  if (!data.length) return <p className="text-gray-500 text-sm">No data found.</p>
+  return <ul className="/* list tailwind classes */">{/* render items */}</ul>
 }
 ```
 
-### 3b. `<ComponentName>.module.css` — Scoped styles
-
-```css
-.root {
-  /* base styles */
-}
-```
-Add relevant states: `.error`, `.empty`, `.loading` based on type.
-
-### 3c. `<ComponentName>.test.tsx` — Unit tests
+### 3b. `<ComponentName>.test.tsx` — Unit tests
 
 Use `@testing-library/react` + `vitest`:
 - Test: renders without crashing
@@ -155,7 +146,7 @@ describe('<ComponentName>', () => {
 })
 ```
 
-### 3d. `index.ts` — Barrel export
+### 3c. `index.ts` — Barrel export
 
 ```ts
 export { <ComponentName> } from './<ComponentName>'
@@ -181,7 +172,6 @@ Files:
   frontend/src/components/<ComponentName>/
     ├── index.ts
     ├── <ComponentName>.tsx
-    ├── <ComponentName>.module.css
     └── <ComponentName>.test.tsx
 
 Usage:
@@ -189,7 +179,7 @@ Usage:
   // or
   import { <ComponentName> } from '@/components'
 
-Next: implement your props, styles, and tests.
+Next: implement your props, Tailwind styles, and tests.
 ```
 
 ---
@@ -200,7 +190,7 @@ Next: implement your props, styles, and tests.
 - **No default exports** for components
 - **No prop drilling** > 2 levels — suggest context or composition
 - **Accessible by default** — semantic HTML + ARIA
-- **CSS Modules only** — no inline styles, no styled-components
-- **Colocate** everything — test, style, component in same folder
+- **Tailwind CSS only** — no inline styles, no CSS Modules, no styled-components
+- **Colocate** everything — test and component in same folder
 - **React 19 APIs** — prefer `useActionState`, `useOptimistic`, `use()` over older patterns
 - **Strict TypeScript** — no type assertions (`as`) unless absolutely necessary

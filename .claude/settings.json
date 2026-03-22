@@ -8,5 +8,18 @@
       "Bash(node *)"
     ],
     "deny": []
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/prettier.js"
+          }
+        ]
+      }
+    ]
   }
 }
