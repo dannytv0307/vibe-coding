@@ -1,15 +1,16 @@
-/**
- * LoginPage — Authentication page for user login
- */
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { AuthCard } from "../../components/AuthCard";
+import { LoginForm } from "../../components/LoginForm";
+
 export function LoginPage() {
+  const { isAuthenticated } = useAuth();
+
+  if (isAuthenticated) return <Navigate to="/" replace />;
+
   return (
-    <div className="grid place-items-center min-h-dvh bg-gray-100" role="main">
-      <div className="w-full max-w-sm p-8 bg-white rounded-2xl shadow-lg">
-        <header className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Login</h1>
-        </header>
-        <div>{/* Auth form component goes here */}</div>
-      </div>
-    </div>
+    <AuthCard title="Sign in">
+      <LoginForm />
+    </AuthCard>
   );
 }
